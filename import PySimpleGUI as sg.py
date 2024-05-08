@@ -51,7 +51,7 @@ def image_flip():
             x_center, y_center = (x1 + x2) / 2 - Width / 2, (y1 + y2) / 2 - Height / 2
             # Поворачиваем координаты рисунка
             new_x_center = x_center * math.cos(math.radians(rotation_angle)) - y_center * math.sin(math.radians(rotation_angle))
-            new_y_center = x_center * math.sin(math.radians(rotation_angle)) + y_center * math.cos(math.radians(rotation_angle))
+            new_y_center = x_center * math.sin(math.radians(rotation_angle + 180 )) + y_center * math.cos(math.radians(rotation_angle))
             # Масштабируем координаты рисунка относительно нового размера изображения
             new_x1, new_y1 = new_x_center + Width / 2 - (x2 - x1) / 2, new_y_center + Height / 2 - (y2 - y1) / 2
             new_x2, new_y2 = new_x_center + Width / 2 + (x2 - x1) / 2, new_y_center + Height / 2 + (y2 - y1) / 2
