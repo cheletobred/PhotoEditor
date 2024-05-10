@@ -1,7 +1,7 @@
 from tkinter import *
 from tkinter import filedialog, colorchooser
-from tkinter.messagebox import showerror
-from PIL import Image, ImageTk
+from tkinter.messagebox import showerror, askyesno
+from PIL import Image, ImageTk, ImageGrab
 import math
 
 window = Tk()
@@ -10,7 +10,7 @@ window.geometry('1200x800')
 window.iconbitmap('rabbit.ico')
 
 def open_image():
-    global filepath, image
+    global filepath, image, drawings
     filepath = filedialog.askopenfilename(title="Open Image File", filetypes=[("Image Files", "*.jpg;*.jpeg;*.png;*.gif;*.bmp")])
     if filepath:
         image = Image.open(filepath)
@@ -58,8 +58,6 @@ def draw(event):
         drawing_coords = (x1, y1, x2, y2)
         drawings.append(drawing_coords)
         working_space.create_oval(x1, y1, x2, y2, fill=pen_color, outline="", width=pen_size, tags="oval")
-    if draw_enabled:
-        button_draw = Button(border="red")
 
 def toggle_draw():
     global draw_enabled
@@ -72,8 +70,12 @@ def change_color():
 is_flipped = False
 
 def photo_mirror():
+    global image, photo_image, is_flipped
+    if is_flipped == True:
+        angle = 180
+    else:
+        angle = 0
     try:
-        global image, photo_image, is_flipped
         if not is_flipped:
             image = Image.open(filepath).transpose(Image.FLIP_LEFT_RIGHT)
             is_flipped = True
@@ -85,10 +87,6 @@ def photo_mirror():
         working_space.create_image(0, 0, anchor="nw", image=photo_image)
         working_space.delete("all")
         working_space.create_image(0, 0, anchor="nw", image=photo_image)
-        if is_flipped == True:
-            angle = 180
-        else:
-            angle = 0
         for drawing in drawings:
             x1, y1, x2, y2 = drawing
             x_center, y_center = (x1 + x2) / 2 - Width / 2, (y1 + y2) / 2 - Height / 2
@@ -100,7 +98,6 @@ def photo_mirror():
 
     except:
         showerror(title='Нельзя отзеркалить', message='Выберите фотографию для отзеркаливания!')
-global image_thin_line
 def thin_size():
     global pen_size
     pen_size = 1
@@ -130,6 +127,25 @@ def change_pen_size():
     button_bold=Button(choice_size,image=image_bold_line, height=50, width=50, command=bold_size)
     button_bold.image =image_bold_line
     button_bold.pack(anchor=CENTER, expand=1)
+def eraser():
+    global drawings
+    working_space.delete("oval")
+    drawings=[]
+def save_image():
+    global is_flipped, rotation_angle, filepath
+    if filepath:
+        image_for_save = ImageGrab.grab(bbox=(working_space.winfo_rootx(), working_space.winfo_rooty(), working_space.winfo_rootx() + working_space.winfo_width(), working_space.winfo_rooty() + working_space.winfo_height()))
+        if is_flipped or rotation_angle % 360 != 0:
+            image_for_save = image_for_save.resize((Width, Height), Image.LANCZOS)
+            if is_flipped:
+                image_for_save = image_for_save.transpose(Image.FLIP_LEFT_RIGHT)
+            if rotation_angle % 360 != 0:
+                image_for_save = image_for_save.rotate(rotation_angle)
+            filepath = filepath.split(".")[0] + "_mod.jpg"
+        filepath = filedialog.asksaveasfilename(defaultextension=".jpg")
+        if filepath:
+            if askyesno(title='Save Image', message='Do you want to save this image?'):
+                image_for_save.save(filepath)
 Width = 1100
 Height = 700
 working_space = Canvas(window, width=Width, height=Height)
@@ -163,5 +179,13 @@ button_mirror.grid(row=0, column=2, padx=(10, 10))
 image_pen_size = PhotoImage(file="pen_size.png").subsample(12, 12)
 button_change_size = Button(down_frame, image=image_pen_size, height=50, width=50, command=change_pen_size)
 button_change_size.grid(row=0, column=5, padx=(10, 10))
+
+image_eraser = PhotoImage(file="eraser.png").subsample(12, 12)
+button_eraser = Button(down_frame, image=image_eraser, height=50, width=50, command=eraser)
+button_eraser.grid(row=0, column=6, padx=(10, 10))
+
+image_save = PhotoImage(file="save.png").subsample(12, 12)
+button_save_image = Button(down_frame, image=image_save, height=50, width=50, command=save_image)
+button_save_image.grid(row=0, column=7, padx=(10, 10))
 
 window.mainloop()
