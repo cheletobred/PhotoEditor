@@ -58,6 +58,8 @@ def draw(event):
         drawing_coords = (x1, y1, x2, y2)
         drawings.append(drawing_coords)
         working_space.create_oval(x1, y1, x2, y2, fill=pen_color, outline="", width=pen_size, tags="oval")
+    if draw_enabled:
+        button_draw = Button(border="red")
 
 def toggle_draw():
     global draw_enabled
@@ -98,7 +100,36 @@ def photo_mirror():
 
     except:
         showerror(title='Нельзя отзеркалить', message='Выберите фотографию для отзеркаливания!')
-
+global image_thin_line
+def thin_size():
+    global pen_size
+    pen_size = 1
+    choice_size.destroy()
+def middle_size():
+    global pen_size
+    pen_size = 3
+    choice_size.destroy()
+def bold_size():
+    global pen_size
+    pen_size = 5
+    choice_size.destroy()
+def change_pen_size():
+    global choice_size, button_thin, button_middle, button_bold
+    choice_size = Toplevel()
+    choice_size.title("Выберите толщину линии")
+    choice_size.geometry("400x200")
+    image_thin_line = PhotoImage(file="thin.png").subsample(12, 12)
+    button_thin=Button(choice_size,image=image_thin_line, height=50, width=50, command=thin_size)
+    button_thin.image =image_thin_line
+    button_thin.pack(anchor=CENTER, expand=1)
+    image_middle_line = PhotoImage(file="middle.png").subsample(12, 12)
+    button_middle=Button(choice_size,image=image_middle_line, height=50, width=50, command=middle_size)
+    button_middle.image =image_middle_line
+    button_middle.pack(anchor=CENTER, expand=1)
+    image_bold_line = PhotoImage(file="bold.png").subsample(12, 12)
+    button_bold=Button(choice_size,image=image_bold_line, height=50, width=50, command=bold_size)
+    button_bold.image =image_bold_line
+    button_bold.pack(anchor=CENTER, expand=1)
 Width = 1100
 Height = 700
 working_space = Canvas(window, width=Width, height=Height)
@@ -119,14 +150,18 @@ button_flip_image.grid(row=0, column=1, padx=(10, 10))
 
 image_draw = PhotoImage(file="pensil.png").subsample(12, 12)
 button_draw = Button(down_frame, image=image_draw, height=50, width=50, command=toggle_draw)
-button_draw.grid(row=0, column=2, padx=(10, 10))
+button_draw.grid(row=0, column=3, padx=(10, 10))
 
 image_color = PhotoImage(file="palette.png").subsample(12, 12)
 button_color = Button(down_frame, image=image_color, height=50, width=50, command=change_color)
-button_color.grid(row=0, column=3, padx=(10, 10))
+button_color.grid(row=0, column=4, padx=(10, 10))
 
 image_mirror = PhotoImage(file="mirror.png").subsample(12, 12)
 button_mirror = Button(down_frame, image=image_mirror, height=50, width=50, command=photo_mirror)
-button_mirror.grid(row=0, column=5, padx=(10, 10))
+button_mirror.grid(row=0, column=2, padx=(10, 10))
+
+image_pen_size = PhotoImage(file="pen_size.png").subsample(12, 12)
+button_change_size = Button(down_frame, image=image_pen_size, height=50, width=50, command=change_pen_size)
+button_change_size.grid(row=0, column=5, padx=(10, 10))
 
 window.mainloop()
